@@ -5,11 +5,11 @@ import pkg_resources
 
 from dateutil.parser import parse
 
-from api_discussion import ApiDiscussion
-from api_teams import ApiTeams
+from .api_discussion import ApiDiscussion
+from .api_teams import ApiTeams
 
-from courseware.courses import get_course_by_id
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.models import StudentModule
 from student.models import (
     CourseEnrollmentManager,
     user_by_anonymous_id,
@@ -125,7 +125,7 @@ class GradedDiscussionXBlock(XBlock, StudioEditableXBlockMixin, XBlockWithSettin
         except KeyError:
             raise
 
-        return ApiDiscussion(settings.LMS_ROOT_URL, unicode(self.course_id), client_id, client_secret, self.location)
+        return ApiDiscussion(settings.LMS_ROOT_URL, str(self.course_id), client_id, client_secret, self.location)
 
     @cached_property
     def api_teams(self):
@@ -227,7 +227,7 @@ class GradedDiscussionXBlock(XBlock, StudioEditableXBlockMixin, XBlockWithSettin
                 image_url=self._get_image_url(user),
                 last_post=self._get_last_date_on_post(self._get_contributions(user.username)),
                 cohort_id=get_cohort_id(user, self.course_id),
-                team=self.api_teams.get_user_team(unicode(self.course_id), user.username),
+                team=self.api_teams.get_user_team(str(self.course_id), user.username),
                 contributions=json.dumps(self._get_contributions(user.username)),
             )
             for user in users if not user.is_staff and user not in graded_students
@@ -237,9 +237,9 @@ class GradedDiscussionXBlock(XBlock, StudioEditableXBlockMixin, XBlockWithSettin
         """
         """
         return dict(
-            item_id=unicode(self.location),
+            item_id=str(self.location),
             item_type='graded_discussion',
-            course_id=unicode(self.course_id),
+            course_id=str(self.course_id),
             student_id=anonymous_id_for_user(user, self.course_id)
         )
 
@@ -366,7 +366,7 @@ class GradedDiscussionXBlock(XBlock, StudioEditableXBlockMixin, XBlockWithSettin
                 users=self.get_student_list(),
                 reload_url=self.runtime.local_resource_url(self, 'public/img/reload-icon.png'),
                 cohorts=get_cohort_names(get_course_by_id(self.course_id)),
-                teams=self.api_teams.get_course_teams(unicode(self.course_id)),
+                teams=self.api_teams.get_course_teams(str(self.course_id)),
                 grading_message=self.grading_message,
             )
 
@@ -400,7 +400,7 @@ class GradedDiscussionXBlock(XBlock, StudioEditableXBlockMixin, XBlockWithSettin
         """
         students = StudentItem.objects.filter(
             course_id=self.course_id,
-            item_id=unicode(self.location)
+            item_id=str(self.location)
         )
         result = []
         for student in students:
