@@ -26,7 +26,7 @@ setup(
     name='graded_discussion-xblock',
     version=__version__,
     description='graded_discussion XBlock',   # TODO: write a better description.
-    license='UNKNOWN',          # TODO: choose a license: 'AGPL v3' and 'Apache 2.0' are popular.
+    license='Apache-2.0',
     packages=[
         'graded_discussion',
     ],
